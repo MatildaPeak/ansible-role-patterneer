@@ -3,16 +3,12 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ name }}
+  name: patterneer-manager
   namespace: {{ namespace }}
-  labels:
-    app: {{ name }}
-    service: {{ name }}
 spec:
   ports:
-  - port: {{ inbound_port }}
-    protocol: TCP
-    targetPort: 9090
+  - name: patterneer-manager
+    port: 80
+    targetPort: rest
   selector:
-    app: {{ name }}
-    service: {{ name }}
+    name: patterneer-manager

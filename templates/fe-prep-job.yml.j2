@@ -1,0 +1,77 @@
+---
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: patterneer-fe-prep
+  namespace: {{ namespace }}
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: patterneer-fe-pullsecret
+
+      initContainers:
+
+      # An 'init-container' to wait for postgres...
+      - image: registry.gitlab.com/matilda.peak/patterneer-fe:{{ fe_image_tag }}
+        name: patterneer-fe-postgres-wait
+        command:
+        - './pg_wait.py'
+        env:
+        - name: PG_ADDR
+          valueFrom:
+            secretKeyRef:
+              name: patterneer-secrets
+              key: pg-addr
+        - name: PG_PORT
+          valueFrom:
+            secretKeyRef:
+              name: patterneer-secrets
+              key: pg-port
+        - name: PG_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: admin-password
+
+      containers:
+
+      # The database preparation container...
+      - image: registry.gitlab.com/matilda.peak/patterneer-fe:{{ fe_image_tag }}
+        name: patterneer-fe-prep
+        command:
+        - './db_create.py'
+        env:
+        # Patterneer user and database...
+        - name: PFE_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: patterneer-secrets
+              key: db-name
+        - name: PFE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: patterneer-secrets
+              key: db-password
+        - name: PFE_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: patterneer-secrets
+              key: db-user
+        # Postgres details...
+        - name: PG_ADDR
+          valueFrom:
+            secretKeyRef:
+              name: patterneer-secrets
+              key: pg-addr
+        - name: PG_PORT
+          valueFrom:
+            secretKeyRef:
+              name: patterneer-secrets
+              key: pg-port
+        - name: PG_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: admin-password
+      restartPolicy: Never

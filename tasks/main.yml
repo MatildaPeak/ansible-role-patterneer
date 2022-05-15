@@ -1,5 +1,17 @@
 ---
 
+# Sanity checks
+
+- name: Check key variables
+  assert:
+    that:
+    - fe_image_pull_secret|string|length > 0
+    - fe_image_pull_secret|string != 'SetMe'
+    - manager_image_pull_secret|string|length > 0
+    - manager_image_pull_secret|string != 'SetMe'
+    - runner_image_pull_secret|string|length > 0
+    - runner_image_pull_secret|string != 'SetMe'
+
 # Deploy our own postgres?
 
 - name: Local postgres
@@ -52,15 +64,16 @@
 
 # Deploy everything else...
 
-#- name: Deploy patterneer
-#  k8s:
-#    state: '{{ state }}'
-#    definition: "{{ lookup('template', '{{ item }}.yml.j2') }}"
-#  loop:
-#  - patterneer-pullsecret
-#  - manager-sgtatefulset
-#  - manager-service
-#  - fe-prep
+- name: Deploy patterneer
+  k8s:
+    state: '{{ state }}'
+    definition: "{{ lookup('template', '{{ item }}.yml.j2') }}"
+  loop:
+  - manager-pullsecret
+  - manager-statefulset
+  - manager-service
+  - fe-pullsecret
+  - fe-prep-job
 #  - fe-statefulset
 #  - fe-service
 #  - fe-ingress
