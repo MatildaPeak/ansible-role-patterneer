@@ -1,0 +1,91 @@
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: postgres
+  namespace: {{ namespace }}
+  labels:
+    app: postgres
+    service: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+      service: postgres
+  template:
+
+    metadata:
+      labels:
+        app: postgres
+        service: postgres
+
+    spec:
+
+{% if postgres_node_affinity_key %}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: {{ postgres_node_affinity_key }}
+                operator: Exists
+{% endif %}
+
+      containers:
+
+      - image: postgres:{{ postgres_image_tag }}
+        name: postgres
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: admin-password
+        resources:
+          requests:
+            cpu: 500m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        startupProbe:
+          timeoutSeconds: 1
+          initialDelaySeconds: 10
+          exec:
+            command:
+            - '/bin/sh'
+            - '-i'
+            - '-c'
+            - psql -U postgres -l
+          failureThreshold: 30
+          periodSeconds: 10
+        readinessProbe:
+          timeoutSeconds: 1
+          initialDelaySeconds: 5
+          exec:
+            command:
+            - '/bin/sh'
+            - '-i'
+            - '-c'
+            - psql -U postgres -l
+        livenessProbe:
+          timeoutSeconds: 1
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: 5432
+        terminationMessagePath: /dev/termination-log
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/pgsql/data
+
+      volumes:
+
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc

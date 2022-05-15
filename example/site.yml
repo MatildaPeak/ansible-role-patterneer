@@ -1,0 +1,12 @@
+---
+
+- hosts: servers
+  tasks:
+  - include_role:
+      name: matildapeak.patterneer
+    vars:
+      deploy_postgres: yes
+      postgres_volume_storageclass: longhorn
+      postgres_node_affinity_key: matildapeak.io/longhorn-node
+      image_tag: stable
+      image_pull_policy: Always

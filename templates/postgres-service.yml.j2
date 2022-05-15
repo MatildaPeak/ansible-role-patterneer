@@ -1,0 +1,19 @@
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: postgres
+  namespace: {{ namespace }}
+  labels:
+    app: postgres
+    service: postgres
+spec:
+  ports:
+  - port: postgres
+    port: {{ postgres_port }}
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: postgres
+    service: postgres

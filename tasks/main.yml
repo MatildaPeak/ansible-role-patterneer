@@ -1,0 +1,66 @@
+---
+
+# Deploy our own postgres?
+
+- name: Local postgres
+  block:
+
+  # Deploy secrets if they don't already exist.
+  # This avoids accidentally changing passwords
+  # (which can't actually be changed!)
+
+  - name: Get postgres secrets
+    k8s_info:
+      kind: Secret
+      api_version: v1
+      namespace: "{{ namespace }}"
+      name: postgres-secrets
+    register: p_result
+
+  - name: Set postgres secrets
+    k8s:
+      state: '{{ state }}'
+      definition: "{{ lookup('template', 'postgres-secrets.yml.j2') }}"
+    when: p_result.resources|length == 0
+
+  - name: Deploy postgres
+    k8s:
+      state: '{{ state }}'
+      definition: "{{ lookup('template', '{{ item }}.yml.j2') }}"
+    loop:
+    - postgres-pvc
+    - postgres
+    - postgres-service
+
+  when: deploy_postgres|bool
+
+# Deploy secrets if they don't already exist.
+
+- name: Get patterneer secrets
+  k8s_info:
+    kind: Secret
+    api_version: v1
+    namespace: "{{ namespace }}"
+    name: patterneer-secrets
+  register: s_result
+
+- name: Set patterneer secrets
+  k8s:
+    state: '{{ state }}'
+    definition: "{{ lookup('template', 'patterneer-secrets.yml.j2') }}"
+  when: s_result.resources|length == 0
+
+# Deploy everything else...
+
+#- name: Deploy patterneer
+#  k8s:
+#    state: '{{ state }}'
+#    definition: "{{ lookup('template', '{{ item }}.yml.j2') }}"
+#  loop:
+#  - patterneer-pullsecret
+#  - manager-sgtatefulset
+#  - manager-service
+#  - fe-prep
+#  - fe-statefulset
+#  - fe-service
+#  - fe-ingress

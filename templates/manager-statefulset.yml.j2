@@ -1,0 +1,72 @@
+---
+
+  apiVersion: v1
+  metadata:
+    name: patterneer-manager
+  spec:
+    replicas: 1
+    selector:
+      name: patterneer-manager
+    template:
+      metadata:
+        labels:
+          name: patterneer-manager
+      spec:
+        serviceAccountName: weyyu
+        nodeSelector:
+          type: patterneer
+        imagePullSecrets:
+        - name: gitlab-matildapeak
+
+        containers:
+
+        # The Patterneer Manager container...
+        - name: patterneer-manager
+          ports:
+          - name: rest
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            tcpSocket:
+              port: 8080
+          livenessProbe:
+            timeoutSeconds: 2
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 8080
+          resources:
+            requests:
+              cpu: 30m
+              memory: 50Mi
+            limits:
+              cpu: 500m
+              memory: 100Mi
+          env:
+          # Stuff that will get passed to the Runners...
+          # Chronicler details...
+          - name: CHRONICLER_ADDR
+            value: ${CHRONICLER_ADDR}
+          - name: CHRONICLER_PORT
+            value: ${CHRONICLER_PORT}
+          # Runner configuration...
+          - name: RUNNER_TAG
+            value: ${RUNNER_TAG}
+          # Per-message resource transmission delay...
+          - name: RESOURCE_MESSAGE_PAUSE
+            value: ${RESOURCE_MESSAGE_PAUSE}
+
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - patterneer-manager
+        from:
+          kind: ImageStreamTag
+          name: patterneer-manager:${TAG}
+    strategy:
+      type: Recreate

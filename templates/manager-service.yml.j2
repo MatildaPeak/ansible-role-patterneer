@@ -1,0 +1,18 @@
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ name }}
+  namespace: {{ namespace }}
+  labels:
+    app: {{ name }}
+    service: {{ name }}
+spec:
+  ports:
+  - port: {{ inbound_port }}
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app: {{ name }}
+    service: {{ name }}

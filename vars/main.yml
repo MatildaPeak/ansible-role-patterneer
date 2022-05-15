@@ -1,0 +1,27 @@
+---
+
+db_name: patteneer
+db_user: patterneer
+db_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=12') }}"
+
+django_secret_key: "{{ lookup('password', '/dev/null chars=ascii_lowercase length=50') }}"
+
+fe_abc_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=12') }}"
+fe_eam_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=12') }}"
+fe_superuser_name: admin
+fe_superuser_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=12') }}"
+fe_superuser_email: info@example.com
+
+postgres_image_tag: 14.2-alpine3.15
+postgres_addr: postgres
+postgres_port: 5432
+postgres_volume_size: 1Gi
+postgres_admin_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=12') }}"
+
+# Do we deploy a postgres instance to the patterneer Namespace?
+# Do this if you do not have a separate postgres deployment.
+deploy_postgres: no
+
+# Extra variables, used if deploying postgres
+postgres_volume_storageclass: ' '
+postgres_node_affinity_key: ''
