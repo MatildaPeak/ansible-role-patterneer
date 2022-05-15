@@ -2,13 +2,12 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ name }}
+  name: patterneer-fe
   namespace: {{ namespace }}
 spec:
   ports:
-  - port: {{ inbound_port }}
-    protocol: TCP
-    targetPort: 9090
+  - name: patterneer-fe
+    port: 80
+    targetPort: django
   selector:
-    app: {{ name }}
-    service: {{ name }}
+    name: patterneer-fe

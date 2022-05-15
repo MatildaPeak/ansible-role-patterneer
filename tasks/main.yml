@@ -74,6 +74,6 @@
   - manager-service
   - fe-pullsecret
   - fe-prep-job
-#  - fe-statefulset
-#  - fe-service
+  - fe-statefulset
+  - fe-service
 #  - fe-ingress

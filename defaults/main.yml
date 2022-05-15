@@ -9,16 +9,21 @@ runner_image_pull_secret: "{{ lookup('env', 'PATTERNEER_RUNNER_GITLAB_PULL_SECRE
 # The image tag and pull policy
 fe_image_tag: stable
 fe_image_pull_policy: IfNotPresent
+fe_log_level: INFO
+fe_django_debug: yes
+manager_api: v1.0
 manager_image_tag: stable
 manager_image_pull_policy: IfNotPresent
 
 # Location of chronicler
-chronicler_addr: http://chronicler.chronicler
+chronicler_addr: http://chronicler.chronicler.svc
 chronicler_port: 9090
 
 # Runner configuration
 runner_tag: stable
 runner_chronicler_key: runner1234
+runner_port: 5001
+runner_api: v1.0
 
 # Manager configuration
 manager_resource_message_pause: '0.3'
