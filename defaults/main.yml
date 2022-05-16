@@ -6,6 +6,10 @@ fe_image_pull_secret: "{{ lookup('env', 'PATTERNEER_FE_GITLAB_PULL_SECRET') }}"
 manager_image_pull_secret: "{{ lookup('env', 'PATTERNEER_MANAGER_GITLAB_PULL_SECRET') }}"
 runner_image_pull_secret: "{{ lookup('env', 'PATTERNEER_RUNNER_GITLAB_PULL_SECRET') }}"
 
+# The front-end ingress hostname, i.e. 'example.com'
+fe_hostname: SetMe
+fe_cert_issuer: letsencrypt-traefik-production
+
 # The image tag and pull policy
 fe_image_tag: stable
 fe_image_pull_policy: IfNotPresent

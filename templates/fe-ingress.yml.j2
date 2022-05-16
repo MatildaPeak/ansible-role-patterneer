@@ -1,0 +1,26 @@
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: patterneer-fe
+  namespace: {{ namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: "{{ fe_cert_issuer|lower }}"
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+spec:
+  tls:
+  - hosts:
+    - {{ fe_hostname }}
+    secretName: patterneer-fe-tls
+  rules:
+  - host: {{ fe_hostname }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: patterneer-fe
+            port:
+              name: http

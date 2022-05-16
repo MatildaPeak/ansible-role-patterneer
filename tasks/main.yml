@@ -5,6 +5,8 @@
 - name: Check key variables
   assert:
     that:
+    - fe_hostname|string|length > 0
+    - fe_hostname|string != 'SetMe'
     - fe_image_pull_secret|string|length > 0
     - fe_image_pull_secret|string != 'SetMe'
     - manager_image_pull_secret|string|length > 0
@@ -62,7 +64,13 @@
     definition: "{{ lookup('template', 'patterneer-secrets.yml.j2') }}"
   when: s_result.resources|length == 0
 
-# Deploy everything else...
+# Deploy everything else
+# Deleting the job to ensure it runs again.
+
+- name: Delete prior prep job
+  k8s:
+    state: 'absent'
+    definition: "{{ lookup('template', 'fe-prep-job.yml.j2') }}"
 
 - name: Deploy patterneer
   k8s:
@@ -76,4 +84,4 @@
   - fe-prep-job
   - fe-statefulset
   - fe-service
-#  - fe-ingress
+  - fe-ingress

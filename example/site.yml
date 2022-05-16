@@ -10,5 +10,6 @@
       postgres_node_affinity_key: matildapeak.io/longhorn-node
       fe_image_tag: latest
       fe_image_pull_policy: Always
+      fe_hostname: patterneer.hopto.org
       manager_image_tag: latest
       manager_image_pull_policy: Always
